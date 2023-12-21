@@ -106,7 +106,7 @@
   </property>
   <property name="windowIcon">
    <iconset>
-    <normaloff>../../Загрузки/satsearch_0aawcw_endurosat_1u_platform.png</normaloff>../../Загрузки/satsearch_0aawcw_endurosat_1u_platform.png</iconset>
+    <normaloff>../Загрузки/satsearch_0aawcw_endurosat_1u_platform.png</normaloff>../Загрузки/satsearch_0aawcw_endurosat_1u_platform.png</iconset>
   </property>
   <property name="autoFillBackground">
    <bool>true</bool>
@@ -205,22 +205,6 @@
      <string>Сопоставить солнечную активность с сигналом</string>
     </property>
    </widget>
-   <widget class="QFrame" name="graph_one">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>140</y>
-      <width>230</width>
-      <height>230</height>
-     </rect>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::StyledPanel</enum>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Raised</enum>
-    </property>
-   </widget>
    <widget class="QTextBrowser" name="textBrowser_one">
     <property name="geometry">
      <rect>
@@ -253,38 +237,6 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;График прямолинейной зависимости корреляции солнечной активности и мощности сигнала&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-    </property>
-   </widget>
-   <widget class="QFrame" name="graph_out">
-    <property name="geometry">
-     <rect>
-      <x>590</x>
-      <y>140</y>
-      <width>280</width>
-      <height>280</height>
-     </rect>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::StyledPanel</enum>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Raised</enum>
-    </property>
-   </widget>
-   <widget class="QFrame" name="graph_two">
-    <property name="geometry">
-     <rect>
-      <x>250</x>
-      <y>140</y>
-      <width>230</width>
-      <height>230</height>
-     </rect>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::StyledPanel</enum>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Raised</enum>
     </property>
    </widget>
    <widget class="QTextBrowser" name="textBrowser_two">
@@ -323,9 +275,66 @@ p, li { white-space: pre-wrap; }
      <enum>Qt::Vertical</enum>
     </property>
    </widget>
+   <widget class="QPlainTextEdit" name="file_path_window">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>380</y>
+      <width>471</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="lineWrapMode">
+     <enum>QPlainTextEdit::NoWrap</enum>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+    <property name="plainText">
+     <string>Файл мощности не выбран</string>
+    </property>
+   </widget>
+   <widget class="PlotWidget" name="graph_out" native="true">
+    <property name="geometry">
+     <rect>
+      <x>590</x>
+      <y>140</y>
+      <width>280</width>
+      <height>280</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="PlotWidget" name="grap_db" native="true">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>140</y>
+      <width>230</width>
+      <height>230</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="PlotWidget" name="graph_sun" native="true">
+    <property name="geometry">
+     <rect>
+      <x>250</x>
+      <y>140</y>
+      <width>230</width>
+      <height>230</height>
+     </rect>
+    </property>
+   </widget>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>PlotWidget</class>
+   <extends>QWidget</extends>
+   <header>pyqtgraph</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
