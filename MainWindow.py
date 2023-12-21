@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'main.ui'
+# Form implementation generated from reading ui file 'MainWindow.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.6
 #
@@ -45,7 +45,7 @@ class Ui_MainWindow(object):
         palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.Window, brush)
         MainWindow.setPalette(palette)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("../../Загрузки/satsearch_0aawcw_endurosat_1u_platform.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap("../Загрузки/satsearch_0aawcw_endurosat_1u_platform.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
         MainWindow.setAutoFillBackground(True)
         MainWindow.setTabShape(QtWidgets.QTabWidget.Rounded)
@@ -77,27 +77,12 @@ class Ui_MainWindow(object):
         self.compare_button = QtWidgets.QPushButton(self.centralwidget)
         self.compare_button.setGeometry(QtCore.QRect(540, 10, 380, 71))
         self.compare_button.setObjectName("compare_button")
-        self.graph_one = QtWidgets.QFrame(self.centralwidget)
-        self.graph_one.setGeometry(QtCore.QRect(10, 140, 230, 230))
-        self.graph_one.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.graph_one.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.graph_one.setObjectName("graph_one")
         self.textBrowser_one = QtWidgets.QTextBrowser(self.centralwidget)
         self.textBrowser_one.setGeometry(QtCore.QRect(10, 85, 230, 51))
         self.textBrowser_one.setObjectName("textBrowser_one")
         self.textBrowser_three = QtWidgets.QTextBrowser(self.centralwidget)
         self.textBrowser_three.setGeometry(QtCore.QRect(540, 85, 380, 50))
         self.textBrowser_three.setObjectName("textBrowser_three")
-        self.graph_out = QtWidgets.QFrame(self.centralwidget)
-        self.graph_out.setGeometry(QtCore.QRect(590, 140, 280, 280))
-        self.graph_out.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.graph_out.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.graph_out.setObjectName("graph_out")
-        self.graph_two = QtWidgets.QFrame(self.centralwidget)
-        self.graph_two.setGeometry(QtCore.QRect(250, 140, 230, 230))
-        self.graph_two.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.graph_two.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.graph_two.setObjectName("graph_two")
         self.textBrowser_two = QtWidgets.QTextBrowser(self.centralwidget)
         self.textBrowser_two.setGeometry(QtCore.QRect(250, 85, 230, 51))
         self.textBrowser_two.setObjectName("textBrowser_two")
@@ -107,6 +92,20 @@ class Ui_MainWindow(object):
         self.line.setLineWidth(3)
         self.line.setFrameShape(QtWidgets.QFrame.VLine)
         self.line.setObjectName("line")
+        self.file_path_window = QtWidgets.QPlainTextEdit(self.centralwidget)
+        self.file_path_window.setGeometry(QtCore.QRect(10, 380, 471, 41))
+        self.file_path_window.setLineWrapMode(QtWidgets.QPlainTextEdit.NoWrap)
+        self.file_path_window.setReadOnly(True)
+        self.file_path_window.setObjectName("file_path_window")
+        self.graph_out = PlotWidget(self.centralwidget)
+        self.graph_out.setGeometry(QtCore.QRect(590, 140, 280, 280))
+        self.graph_out.setObjectName("graph_out")
+        self.grap_db = PlotWidget(self.centralwidget)
+        self.grap_db.setGeometry(QtCore.QRect(10, 140, 230, 230))
+        self.grap_db.setObjectName("grap_db")
+        self.graph_sun = PlotWidget(self.centralwidget)
+        self.graph_sun.setGeometry(QtCore.QRect(250, 140, 230, 230))
+        self.graph_sun.setObjectName("graph_sun")
         MainWindow.setCentralWidget(self.centralwidget)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
@@ -135,3 +134,5 @@ class Ui_MainWindow(object):
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'Ubuntu\'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">График зависимости солнечной активности ко времени</span></p></body></html>"))
+        self.file_path_window.setPlainText(_translate("MainWindow", "Файл мощности не выбран"))
+from pyqtgraph import PlotWidget
