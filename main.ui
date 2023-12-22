@@ -10,6 +10,12 @@
     <height>443</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
   <property name="palette">
    <palette>
     <active>
@@ -184,9 +190,14 @@
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>471</width>
+      <width>231</width>
       <height>71</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
     </property>
     <property name="text">
      <string>Выбрать файл &quot;мощность сигнала&quot;</string>
@@ -322,6 +333,25 @@ p, li { white-space: pre-wrap; }
       <width>230</width>
       <height>230</height>
      </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="input_button_sun">
+    <property name="geometry">
+     <rect>
+      <x>250</x>
+      <y>10</y>
+      <width>231</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+      <kerning>true</kerning>
+     </font>
+    </property>
+    <property name="text">
+     <string>Получить солнечную активность из сети</string>
     </property>
    </widget>
   </widget>
