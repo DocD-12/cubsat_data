@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QMessageBox
 
 from MainWindow import Ui_MainWindow
 
+import  openpyxl
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, *args, obj=None, **kwargs):
@@ -17,11 +18,28 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     filepath_txt = ["", ""]
     successful_updated = False
+
+
+
     def choose_txt(self):
-        _filepath_txt = QFileDialog.getOpenFileName(self, str("Загрузить txt файл мощности"), "/", str("TEXT (*.txt)"))
+        _filepath_txt = QFileDialog.getOpenFileName(self, str("Загрузить txt файл мощности"), "/", str("TEXT (*.xlsx)"))
+        excel = openpyxl.open(_filepath_txt[0], read_only=True)
+        lists = excel.worksheets
+        lists_num = 0
+        A_list = 0
+        B_list = 1
+        data_list_X = []
+        data_list_Y = []
+        for i in range(1, lists[lists_num].max_row + 1):
+            data_list_X.append(lists[lists_num][i][A_list].value)
+            data_list_Y.append(lists[lists_num][i][B_list].value)
+
+        data_list_X = list(map(float,data_list_X))
+        data_list_Y = list(map(float, data_list_Y))
+
         if (_filepath_txt[0] != ""):
             self.ui.file_path_window.setPlainText("Выбран файл мощности по пути: " + str(_filepath_txt))
-            self.set_db_graph([1,2,3,4,5,6,7,8,9,10], [5,78,34,21,34,23,34,45,67,89], False) # Нужно передавать судя данные из txt файла и алгоритма построения графика
+            self.set_db_graph(data_list_X, data_list_Y, False) # Нужно передавать судя данные из txt файла и алгоритма построения графика
             # self.set_sun_graph([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [34, 23, 34, 89, 12, 89, 12, 14, 100, 0], False) # Нужно передавать судя данные из txt файла и алгоритма построения графика
         else:
             self.ui.file_path_window.setPlainText("Файл мощности не выбран")
@@ -29,6 +47,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             # self.set_sun_graph(0, 0, True)
             self.compare_out(0, 0, True)
         self.filepath_txt = _filepath_txt
+
 
     def update_sun_activity(self):
         # Программа парсера погоды
