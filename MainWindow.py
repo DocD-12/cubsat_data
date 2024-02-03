@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(936, 443)
+        MainWindow.resize(975, 443)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -83,19 +83,19 @@ class Ui_MainWindow(object):
         self.inputbutton.setFont(font)
         self.inputbutton.setObjectName("inputbutton")
         self.compare_button = QtWidgets.QPushButton(self.centralwidget)
-        self.compare_button.setGeometry(QtCore.QRect(540, 10, 380, 71))
+        self.compare_button.setGeometry(QtCore.QRect(510, 10, 461, 71))
         self.compare_button.setObjectName("compare_button")
         self.textBrowser_one = QtWidgets.QTextBrowser(self.centralwidget)
         self.textBrowser_one.setGeometry(QtCore.QRect(10, 85, 230, 51))
         self.textBrowser_one.setObjectName("textBrowser_one")
         self.textBrowser_three = QtWidgets.QTextBrowser(self.centralwidget)
-        self.textBrowser_three.setGeometry(QtCore.QRect(540, 85, 380, 50))
+        self.textBrowser_three.setGeometry(QtCore.QRect(510, 85, 461, 50))
         self.textBrowser_three.setObjectName("textBrowser_three")
         self.textBrowser_two = QtWidgets.QTextBrowser(self.centralwidget)
         self.textBrowser_two.setGeometry(QtCore.QRect(250, 85, 230, 51))
         self.textBrowser_two.setObjectName("textBrowser_two")
         self.line = QtWidgets.QFrame(self.centralwidget)
-        self.line.setGeometry(QtCore.QRect(510, -10, 17, 441))
+        self.line.setGeometry(QtCore.QRect(487, 0, 17, 441))
         self.line.setFrameShadow(QtWidgets.QFrame.Raised)
         self.line.setLineWidth(3)
         self.line.setFrameShape(QtWidgets.QFrame.VLine)
@@ -106,7 +106,7 @@ class Ui_MainWindow(object):
         self.file_path_window.setReadOnly(True)
         self.file_path_window.setObjectName("file_path_window")
         self.graph_out = PlotWidget(self.centralwidget)
-        self.graph_out.setGeometry(QtCore.QRect(590, 140, 280, 280))
+        self.graph_out.setGeometry(QtCore.QRect(510, 140, 280, 280))
         self.graph_out.setObjectName("graph_out")
         self.grap_db = PlotWidget(self.centralwidget)
         self.grap_db.setGeometry(QtCore.QRect(10, 140, 230, 230))
@@ -121,6 +121,11 @@ class Ui_MainWindow(object):
         font.setKerning(True)
         self.input_button_sun.setFont(font)
         self.input_button_sun.setObjectName("input_button_sun")
+        self.CorrBox = QtWidgets.QTextEdit(self.centralwidget)
+        self.CorrBox.setGeometry(QtCore.QRect(800, 140, 171, 31))
+        self.CorrBox.setMouseTracking(False)
+        self.CorrBox.setReadOnly(True)
+        self.CorrBox.setObjectName("CorrBox")
         MainWindow.setCentralWidget(self.centralwidget)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
@@ -151,4 +156,9 @@ class Ui_MainWindow(object):
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">График зависимости солнечной активности ко времени</span></p></body></html>"))
         self.file_path_window.setPlainText(_translate("MainWindow", "Файл мощности не выбран"))
         self.input_button_sun.setText(_translate("MainWindow", "Получить солнечную активность из сети"))
+        self.CorrBox.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:\'Ubuntu\'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:9pt;\">Кореляция: -</span></p></body></html>"))
 from pyqtgraph import PlotWidget
