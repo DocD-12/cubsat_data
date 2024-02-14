@@ -9,6 +9,7 @@ import numpy as np
 
 import openpyxl
 
+
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, *args, obj=None, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
@@ -44,6 +45,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     corr_list_sun_Y = []
 
+    range_1 = 0
+    range_2 = 0
     range_end = 0
 
     _filepath_txt = None
@@ -70,12 +73,14 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.corr_list_db_Y.clear()
         self.corr_list_sun_Y.clear()
         self.ui.graph_out.clear()
+
     def choose_txt(self):
         self.ClearDB()
-        self._filepath_txt = QFileDialog.getOpenFileName(self, str("Загрузить .xlsx мощности"), "/", str("xlsx (*.xlsx)"))
+        self._filepath_txt = QFileDialog.getOpenFileName(self, str("Загрузить .xlsx мощности"), "/",
+                                                         str("xlsx (*.xlsx)"))
 
         if (str(self._filepath_txt[0]) == "" or self._filepath_txt == None):
-            print("Empty file!!!")
+            print("Empty file or File not choose!")
             return
 
         self.excel1 = openpyxl.open(self._filepath_txt[0], read_only=True)
@@ -83,16 +88,37 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.lists_num1 = 0
         A_list = 0
         B_list = 1
+
         for i in range(1, self.lists1[self.lists_num1].max_row + 1):
-            self.data_list_db_X.append(self.lists1[self.lists_num1][i][A_list].value)
-            self.data_list_db_Y.append(self.lists1[self.lists_num1][i][B_list].value)
+            if ((self.lists1[self.lists_num1][i][A_list].value is not None) and (self.lists1[self.lists_num1][i][B_list].value is not None)):
+                self.data_list_db_X.append(self.lists1[self.lists_num1][i][A_list].value)
+                self.data_list_db_Y.append(self.lists1[self.lists_num1][i][B_list].value)
+            else:
+                msg = QMessageBox()
+                msg.setIcon(QMessageBox.Warning)
+                msg.setText("Неправильные строки")
+                msg.setInformativeText('Часть строк была обрезана, во избежание ошибки!')
+                msg.setWindowTitle("Сопоставление данных")
+                msg.exec_()
+                break
+        print("data_list_db_X", self.data_list_db_X)
+        print("data_list_db_Y", self.data_list_db_Y)
 
-        self.data_list_db_X = list(map(float, self.data_list_db_X))
-        self.data_list_db_Y = list(map(float, self.data_list_db_Y))
+        try:
+            self.data_list_db_X = list(map(float, self.data_list_db_X))
+            self.data_list_db_Y = list(map(float, self.data_list_db_Y))
+        except ValueError:
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Critical)
+            msg.setText("Неправильные строки")
+            msg.setInformativeText('Вероятно часть строк не соответствует нужному формату!')
+            msg.setWindowTitle("Чтение строк")
+            msg.exec_()
 
-        if (self._filepath_txt[0] != ""):
+        if self._filepath_txt[0] != "":
             self.ui.file_path_window.setPlainText("Выбран файл мощности по пути: " + str(self._filepath_txt))
-            self.set_db_graph(self.data_list_db_X, self.data_list_db_Y, False) # Нужно передавать судя данные из txt файла и алгоритма построения графика
+            self.set_db_graph(self.data_list_db_X, self.data_list_db_Y,
+                              False)  # Нужно передавать судя данные из txt файла и алгоритма построения графика
             # self.set_sun_graph([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [34, 23, 34, 89, 12, 89, 12, 14, 100, 0], False) # Нужно передавать судя данные из txt файла и алгоритма построения графика
         else:
             self.ui.file_path_window.setPlainText("Файл мощности не выбран")
@@ -103,12 +129,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def update_sun_activity(self):
         # Программа парсера погоды
-        successful = True # Получена ли успешно погода?
+        successful = True  # Получена ли успешно погода?
         self.ClearSun()
-        self._filepath_sun_txt = QFileDialog.getOpenFileName(self, str("Загрузить .xlsx файл солнечной активности"), "/", str("xlsx (*.xlsx)"))
+        self._filepath_sun_txt = QFileDialog.getOpenFileName(self, str("Загрузить .xlsx файл солнечной активности"),
+                                                             "/", str("xlsx (*.xlsx)"))
 
-        if (str(self._filepath_sun_txt[0]) == "" or self._filepath_sun_txt == None):
-            print("Empty file!!!")
+        if str(self._filepath_sun_txt[0]) == "" or self._filepath_sun_txt is None:
+            print("Empty file or File not choose!")
             return
         self.excel2 = openpyxl.open(self._filepath_sun_txt[0], read_only=True)
         self.lists2 = self.excel2.worksheets
@@ -116,14 +143,35 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         A_list = 0
         B_list = 1
         for i in range(1, self.lists2[self.lists_num2].max_row + 1):
-            self.data_list_sun_X.append(self.lists2[self.lists_num2][i][A_list].value)
-            self.data_list_sun_Y.append(self.lists2[self.lists_num2][i][B_list].value)
+            if (self.lists2[self.lists_num2][i][A_list].value is not None) and (
+                    self.lists2[self.lists_num2][i][B_list].value is not None):
+                self.data_list_sun_X.append(self.lists2[self.lists_num2][i][A_list].value)
+                self.data_list_sun_Y.append(self.lists2[self.lists_num2][i][B_list].value)
+            else:
+                msg = QMessageBox()
+                msg.setIcon(QMessageBox.Warning)
+                msg.setText("Неправильные строки")
+                msg.setInformativeText('Часть строк была обрезана, во избежание ошибки!')
+                msg.setWindowTitle("Сопоставление данных")
+                msg.exec_()
+                break
+        print("data_list_sun_X", self.data_list_sun_X)
+        print("data_list_sun_Y", self.data_list_sun_Y)
 
-        self.data_list_sun_X = list(map(float, self.data_list_sun_X))
-        self.data_list_sun_Y = list(map(float, self.data_list_sun_Y))
+        try:
+            self.data_list_sun_X = list(map(float, self.data_list_sun_X))
+            self.data_list_sun_Y = list(map(float, self.data_list_sun_Y))
+        except ValueError:
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Critical)
+            msg.setText("Неправильные строки")
+            msg.setInformativeText('Вероятно часть строк не соответствует нужному формату!')
+            msg.setWindowTitle("Чтение строк")
+            msg.exec_()
 
-        if (self._filepath_sun_txt[0] != ""):
-            self.set_sun_graph(self.data_list_sun_X, self.data_list_sun_Y, False) # Нужно передавать судя данные из txt файла и алгоритма построения графика
+        if self._filepath_sun_txt[0] != "":
+            self.set_sun_graph(self.data_list_sun_X, self.data_list_sun_Y,
+                               False)  # Нужно передавать судя данные из txt файла и алгоритма построения графика
         else:
             self.ui.file_path_window.setPlainText("Файл солнечной активности не выбран")
             self.set_db_graph(0, 0, True)
@@ -157,26 +205,26 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             msg.setIcon(QMessageBox.Critical)
             msg.setText("Ошибка")
             msg.setInformativeText('Файл мощности (.xlsx) не был выбран!')
-            msg.setWindowTitle("Сопостовленние данных")
+            msg.setWindowTitle("Сопоставление данных")
             msg.exec_()
             return
-        if (self.filepath_sun_txt[0] == ""): # НУЖНО ПОМЕНЯТЬ НА ПАРСЕР ПОГОДЫ
+        if (self.filepath_sun_txt[0] == ""):  # НУЖНО ПОМЕНЯТЬ НА ПАРСЕР ПОГОДЫ
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Critical)
             msg.setText("Ошибка")
             msg.setInformativeText('Файл солнечной активности (.xlsx) не был выбран!')
-            msg.setWindowTitle("Сопостовленние данных")
+            msg.setWindowTitle("Сопоставление данных")
             msg.exec_()
             return
 
-        if (self.lists1[self.lists_num1].max_row + 1) > (self.lists2[self.lists_num2].max_row + 1):
-            self.range_end = self.lists2[self.lists_num2].max_row + 1
+        if (len(self.data_list_db_X)) > (len(self.data_list_sun_X)):
+            self.range_end = len(self.data_list_sun_X)
             error += 1
-        elif (self.lists1[self.lists_num1].max_row + 1) < (self.lists2[self.lists_num2].max_row + 1):
-            self.range_end = self.lists1[self.lists_num1].max_row + 1
+        elif (len(self.data_list_db_X)) < (len(self.data_list_sun_X)):
+            self.range_end = len(self.data_list_db_X)
             error += 1
         else:
-            self.range_end = self.lists1[self.lists_num1].max_row + 1
+            self.range_end = len(self.data_list_db_X)
 
         for i in range(1, self.range_end):
             self.corr_list_db_Y.append(self.lists1[self.lists_num1][i][1].value)
@@ -189,34 +237,37 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             msg.setIcon(QMessageBox.Critical)
             msg.setText("Ошибка")
             msg.setInformativeText('Файл мощности (.xlsx) не был выбран!')
-            msg.setWindowTitle("Сопостовленние данных")
+            msg.setWindowTitle("Сопоставление данных")
             msg.exec_()
         else:
             if error == 0:
-                print("error 0")
+                print("No error")
                 msg = QMessageBox()
                 msg.setIcon(QMessageBox.Information)
                 msg.setText("Успешно")
-                msg.setInformativeText('Данные сопоставленны успешно')
-                msg.setWindowTitle("Сопостовление данных")
+                msg.setInformativeText('Данные сопоставлены успешно')
+                msg.setWindowTitle("Сопоставление данных")
                 msg.exec_()
-                self.compare_out(self.corr_list_db_Y, self.corr_list_sun_Y, False)  # Нужно передавать судя данные из алгоритма, которыми занимаются математики
+                self.compare_out(self.corr_list_db_Y, self.corr_list_sun_Y,
+                                 False)  # Нужно передавать судя данные из алгоритма, которыми занимаются математики
                 print(self.corr_list_db_Y)
                 print(self.corr_list_sun_Y)
                 print(corr)
                 self.ui.CorrBox.setPlainText(f"Корреляция: {corr:.2f}")
             else:
-                print("No error")
+                error = 0
+                print("Error!")
                 msg = QMessageBox()
                 msg.setIcon(QMessageBox.Warning)
-                msg.setText("Обнаружена неточность")
-                msg.setInformativeText('Количество строк двух таблиц не совпадает!')
-                msg.setWindowTitle("Сопостовленние данных")
+                msg.setText("Неправильные строки")
+                msg.setInformativeText('Часть строк была обрезана, во избежание ошибки в корреляции!')
+                msg.setWindowTitle("Сопоставление данных")
                 msg.exec_()
-                self.compare_out(self.corr_list_db_Y, self.corr_list_sun_Y,False)  # Нужно передавать судя данные из алгоритма, которыми занимаются математики
-                print(self.corr_list_db_Y)
-                print(self.corr_list_sun_Y)
-                print(corr)
+                self.compare_out(self.corr_list_db_Y, self.corr_list_sun_Y,
+                                 False)  # Нужно передавать судя данные из алгоритма, которыми занимаются математики
+                print("corr_list_db_Y", self.corr_list_db_Y)
+                print("corr_list_sun_Y", self.corr_list_sun_Y)
+                print("Корреляция:", corr)
                 self.ui.CorrBox.setPlainText(f"Корреляция: {corr:.2f}")
 
         """
@@ -225,25 +276,28 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             msg.setIcon(QMessageBox.Critical)
             msg.setText("Ошибка")
             msg.setInformativeText('Не получена солнечная активность!')
-            msg.setWindowTitle("Сопостовленние данных")
+            msg.setWindowTitle("Сопоставление данных")
             msg.exec_()
         """
-    def compare_out(self, activity, power_db, clear): # Вывод графика зависимости солнечной активности от db
-        if not(clear):
+
+    def compare_out(self, activity, power_db, clear):  # Вывод графика зависимости солнечной активности от db
+        if not clear:
             poly = np.polyfit(self.corr_list_db_Y, self.corr_list_sun_Y, deg=3)
             line = np.polyval(poly, self.corr_list_db_Y)
 
             self.ui.graph_out.plot(activity, power_db, pen=None, name="blue", symbol='o')
-            self.ui.graph_out.plot(self.corr_list_db_Y, line, pen ='g', symbolBrush=1)
+            self.ui.graph_out.plot(self.corr_list_db_Y, line, pen='g', symbolBrush=1)
         else:
             self.ui.graph_out.clear()
-    def set_db_graph(self, time, db, clear): # Вывод графика зависимости времени от db
-        if not(clear):
+
+    def set_db_graph(self, time, db, clear):  # Вывод графика зависимости времени от db
+        if not clear:
             self.ui.grap_db.plot(time, db)
         else:
             self.ui.grap_db.clear()
-    def set_sun_graph(self, activity, time, clear): # Вывод графика зависимости солнечной активности от времени
-        if not(clear):
+
+    def set_sun_graph(self, activity, time, clear):  # Вывод графика зависимости солнечной активности от времени
+        if not clear:
             self.ui.graph_sun.plot(activity, time)
         else:
             self.ui.graph_sun.clear()
