@@ -306,6 +306,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 app = QtWidgets.QApplication(sys.argv)
 
 window = MainWindow()
-window.setFixedSize(975, 443)
+window.setFixedSize(997, 474)
 window.show()
 app.exec()
