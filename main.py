@@ -7,7 +7,13 @@ from MainWindow import Ui_MainWindow
 
 import numpy as np
 
+import sys as sys
+sys.setrecursionlimit(1000000000)
+
 import openpyxl
+
+import functools as functools
+functools.lru_cache(None)
 
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
@@ -198,6 +204,14 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def compare_click(self):
         error = 0
 
+        # self.corr_list_db_Y = list(map(float, self.corr_list_db_Y))
+        # self.corr_list_sun_Y = list(map(float, self.corr_list_sun_Y))
+
+        # print("corr_list_sun_Y", type(self.corr_list_sun_Y))
+        # print("corr_list_sun_Y[i]", type(self.corr_list_sun_Y[10]))
+        # print("corr_list_db_Y", type(self.corr_list_db_Y))
+        # print("corr_list_db_Y[i]", type(self.corr_list_db_Y[10]))
+
         self.ClearCompare()
 
         if (self.filepath_txt[0] == ""):
@@ -229,6 +243,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         for i in range(1, self.range_end):
             self.corr_list_db_Y.append(self.lists1[self.lists_num1][i][1].value)
             self.corr_list_sun_Y.append(self.lists2[self.lists_num2][i][1].value)
+
+        self.corr_list_db_Y = list(map(float, self.corr_list_db_Y))
+        self.corr_list_sun_Y = list(map(float, self.corr_list_sun_Y))
 
         corr = np.corrcoef(self.corr_list_sun_Y, self.corr_list_db_Y)[0, 1]
 
