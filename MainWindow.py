@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(997, 474)
+        MainWindow.resize(997, 486)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -95,7 +95,7 @@ class Ui_MainWindow(object):
         self.textBrowser_two.setGeometry(QtCore.QRect(250, 85, 230, 51))
         self.textBrowser_two.setObjectName("textBrowser_two")
         self.line = QtWidgets.QFrame(self.centralwidget)
-        self.line.setGeometry(QtCore.QRect(487, 0, 17, 500))
+        self.line.setGeometry(QtCore.QRect(487, 0, 17, 491))
         self.line.setFrameShadow(QtWidgets.QFrame.Raised)
         self.line.setLineWidth(3)
         self.line.setFrameShape(QtWidgets.QFrame.VLine)
@@ -106,7 +106,7 @@ class Ui_MainWindow(object):
         self.file_path_window.setReadOnly(True)
         self.file_path_window.setObjectName("file_path_window")
         self.graph_out = PlotWidget(self.centralwidget)
-        self.graph_out.setGeometry(QtCore.QRect(510, 140, 305, 305))
+        self.graph_out.setGeometry(QtCore.QRect(510, 140, 301, 311))
         self.graph_out.setObjectName("graph_out")
         self.grap_db = PlotWidget(self.centralwidget)
         self.grap_db.setGeometry(QtCore.QRect(10, 140, 230, 230))
@@ -126,12 +126,8 @@ class Ui_MainWindow(object):
         self.CorrBox.setMouseTracking(False)
         self.CorrBox.setReadOnly(True)
         self.CorrBox.setObjectName("CorrBox")
-        self.progressBar = QtWidgets.QProgressBar(self.centralwidget)
-        self.progressBar.setGeometry(QtCore.QRect(250, 425, 231, 23))
-        self.progressBar.setProperty("value", 0)
-        self.progressBar.setObjectName("progressBar")
         self.comboBox = QtWidgets.QComboBox(self.centralwidget)
-        self.comboBox.setGeometry(QtCore.QRect(10, 425, 231, 25))
+        self.comboBox.setGeometry(QtCore.QRect(10, 430, 471, 24))
         self.comboBox.setObjectName("comboBox")
         MainWindow.setCentralWidget(self.centralwidget)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
@@ -150,17 +146,23 @@ class Ui_MainWindow(object):
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'Ubuntu\'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">График зависимости мощности сигнала от db к времени</span></p></body></html>"))
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">График зависимости мощности сигнала CubeSat (dBm) ко времени (UNIX).</span></p></body></html>"))
+        self.textBrowser_three.setMarkdown(_translate("MainWindow", "График корреляции мощности сигнала CubeSat и солнечной активности.\n"
+"\n"
+""))
         self.textBrowser_three.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'Ubuntu\'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">График прямолинейной зависимости корреляции солнечной активности и мощности сигнала</span></p></body></html>"))
+"<p style=\" margin-top:7px; margin-bottom:7px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">График корреляции мощности сигнала CubeSat и солнечной активности.</p></body></html>"))
+        self.textBrowser_two.setMarkdown(_translate("MainWindow", "График зависимости солнечной активности ко времени.\n"
+"\n"
+""))
         self.textBrowser_two.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'Ubuntu\'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">График зависимости солнечной активности ко времени</span></p></body></html>"))
+"<p style=\" margin-top:7px; margin-bottom:7px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">График зависимости солнечной активности ко времени.</span></p></body></html>"))
         self.file_path_window.setPlainText(_translate("MainWindow", "Файл мощности не выбран"))
         self.input_button_sun.setText(_translate("MainWindow", "Получить солнечную активность из сети"))
         self.CorrBox.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
