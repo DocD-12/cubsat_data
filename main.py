@@ -150,7 +150,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def choose_txt(self):
         self.ClearDB()
-        self._filepath_txt = QFileDialog.getOpenFileName(self, str("Загрузить .xlsx мощности"), "/",
+        self._filepath_txt = QFileDialog.getOpenFileName(self, str("Загрузить .xlsx мощности"), "./",
                                                          str("xlsx (*.xlsx)"))
 
         if not self._filepath_txt[0]:
@@ -219,7 +219,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         successful = True
         self.ClearSun()
         self._filepath_sun_txt = QFileDialog.getOpenFileName(self, str("Загрузить .xlsx файл солнечной активности"),
-                                                             "/", str("xlsx (*.xlsx)"))
+                                                             "./", str("xlsx (*.xlsx)"))
 
         if not self._filepath_sun_txt[0]:
             print("Выбран пустой файл или ничего не выбрано!")
