@@ -1,5 +1,6 @@
 import functools as functools
 import sys
+import time
 from datetime import datetime
 
 import numpy as np
@@ -8,9 +9,15 @@ from MainWindow import Ui_MainWindow
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QFileDialog, QMessageBox
 
+import sunpy.timeseries as ts
+from sunpy.net import Fido, attrs as a
+import pyqtgraph as pg
+
+
 functools.lru_cache(None)
 
 print("_" * 100)
+
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, *args, obj=None, **kwargs):
@@ -20,6 +27,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.ui.inputbutton.clicked.connect(self.choose_txt)
         self.ui.compare_button.clicked.connect(self.compare_click)
         self.ui.input_button_sun.clicked.connect(self.update_sun_activity)
+
+        self.start_data = None
+        self.end_data = None
+        self.x_values = []
 
         plot_db = self.ui.grap_db
         plot_db.setLabel(axis='left', text='Мощность')
@@ -82,21 +93,43 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.ClearDB()
         self.set_db_graph(0, 0, True)
 
-        selected_sheet_name = self.lists_combo[index]  # Получаем имя выбранного листа по индексу
-        selected_sheet = self.excel1[selected_sheet_name]  # Получаем выбранный лист
+        if not self.lists_combo:
+            return
+        else:
+            selected_sheet_name = self.lists_combo[index]  # Получаем имя выбранного листа по индексу
+            selected_sheet = self.excel1[selected_sheet_name]  # Получаем выбранный лист
 
         self.data_list_db_X.clear()
         self.data_list_db_Y.clear()
+        previous_value = None  # Инициализируем переменную для хранения значения предыдущей ячейки столбца A
+        previous_B_values = []
 
         for row in selected_sheet.iter_rows(min_row=2, max_row=selected_sheet.max_row, min_col=1, max_col=2):
             if all(cell.value is not None for cell in row):
                 try:
-                    self.data_list_db_X.append(self.to_UNIX(row[0].value))
-                    self.data_list_db_Y.append(row[1].value)
-                except:
-                    self.data_list_db_X.clear()
-                    self.data_list_db_Y.clear()
+                    current_value = row[0].value  # Получаем значение текущей ячейки столбца A
+                    current_B_value = row[1].value  # Получаем значение текущей ячейки столбца B
 
+                    # Преобразуем значение B в числовой формат, если оно не является числом
+                    if not isinstance(current_B_value, (int, float)):
+                        current_B_value = float(current_B_value)
+
+                    if current_value == previous_value:  # Проверяем, совпадают ли текущее и предыдущее значения столбца A
+                        previous_B_values.append(current_B_value)  # Добавляем значение B в список
+                    else:
+                        if previous_value is not None:  # Проверяем, было ли уже какое-то значение столбца A
+                            # Если было, усредняем значения B и добавляем в список
+                            avg_B = sum(previous_B_values) / len(previous_B_values)
+                            self.data_list_db_Y.append(avg_B)
+                            self.data_list_db_X.append(self.to_UNIX(previous_value))
+                        # Обновляем значения для следующей итерации
+                        previous_value = current_value
+                        previous_B_values = [current_B_value]
+                except Exception as e:
+                    self.data_list_db_X.clear()  # Очищаем список данных X в случае ошибки
+                    self.data_list_db_Y.clear()  # Очищаем список данных Y в случае ошибки
+
+                    # Создание и отображение сообщения об ошибке
                     msg = QMessageBox()
                     msg.setIcon(QMessageBox.Critical)
                     msg.setText("Ошибка")
@@ -104,16 +137,31 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                         f'Не удалось конвертировать время в UNIX формат. Строка: {row}')
                     msg.setWindowTitle("Конвертация данных")
                     msg.exec_()
-                    break
+                    break  # Прерываем выполнение цикла в случае ошибки
             else:
                 self.show_warning_message("Неправильные строки")
-                break
+                break  # Прерываем выполнение цикла, если есть пустые ячейки в строке
+
+        # Добавляем последнее значение
+        if previous_value is not None:
+            avg_B = sum(previous_B_values) / len(previous_B_values)
+            self.data_list_db_Y.append(avg_B)
+            self.data_list_db_X.append(self.to_UNIX(previous_value))
+
+        if len(self.data_list_db_X) != 0 and len(self.data_list_db_Y) != 0:
+            self.data_list_db_X.pop()
+            self.data_list_db_Y.pop()
+
+        self.start_data = selected_sheet.cell(row=2, column=1).value
+        self.end_data = selected_sheet.cell(row=selected_sheet.max_row, column=1).value
 
         print("CubeSat")
         print(f"Выбран лист: {selected_sheet_name}")
-        print("Количество строк:", selected_sheet.max_row)
+        print("Количество строк:", len(self.data_list_db_Y))
         print("data_list_db_X:", self.data_list_db_X)
         print("data_list_db_Y:", self.data_list_db_Y)
+        print("Первая строка:", self.start_data)
+        print("Последняя строка:", self.end_data)
         print("_" * 100)
 
         try:
@@ -125,10 +173,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.ui.file_path_window.setPlainText("Выбран файл мощности по пути: " + str(self._filepath_txt))
         self.set_db_graph(self.data_list_db_X, self.data_list_db_Y, False)
 
-
     def to_UNIX(self, date_string):
-        from datetime import datetime
-
         date_string = date_string.strip("'")
         date_components = date_string.split('-')
 
@@ -148,20 +193,44 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         return unix_time
 
+    def to_sunPy_time(self, date_string):
+        date_string = date_string.strip("'")
+        date_components = date_string.split('-')
+
+        months = {'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'Jun': 6, 'Jul': 7, 'Aug': 8, 'Sep': 9, 'Oct': 10,
+                  'Nov': 11, 'Dec': 12}
+        month = months[date_components[1]]
+
+        year = int(date_components[2][:4])
+        time_components = date_components[2].split()
+        time_parts = time_components[1].split(':')
+        hour = int(time_parts[0])
+        minute = int(time_parts[1])
+        second = int(time_parts[2])
+
+        datetime_obj = datetime(year, month, int(date_components[0]), hour, minute, second)
+        unix_time = datetime_obj.timestamp()
+
+        return datetime.utcfromtimestamp(unix_time).strftime('%Y-%m-%dT%H:%M:%S')
+
     def choose_txt(self):
         self.ClearDB()
-        self._filepath_txt = QFileDialog.getOpenFileName(self, str("Загрузить .xlsx мощности"), "./",
+        self._filepath_txt = QFileDialog.getOpenFileName(self, str("Загрузить .xlsx мощности"), "/",
                                                          str("xlsx (*.xlsx)"))
 
         if not self._filepath_txt[0]:
+            self.excel1 = None
+            self.lists1 = None
+            self.filepath_txt = self._filepath_txt
+            self.lists_combo = []
+            self.ui.comboBox.clear()
             print("Выбран пустой файл или ничего не выбрано!")
+            print("_" * 100)
             return
 
         self.excel1 = openpyxl.open(self._filepath_txt[0], read_only=True)
         self.lists1 = self.excel1.worksheets
         self.lists_num1 = 0
-        A_list = 0
-        B_list = 1
 
         self.lists_combo = self.excel1.sheetnames
         self.ui.comboBox.clear()
@@ -172,11 +241,30 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.data_list_db_X = []
         self.data_list_db_Y = []
 
+        previous_value = None
+        previous_B_values = []
+
         for row in self.lists1[self.lists_num1].iter_rows(min_row=2, max_row=self.lists1[self.lists_num1].max_row, min_col=1, max_col=2):
             if all(cell.value is not None for cell in row):
                 try:
-                    self.data_list_db_X.append(self.to_UNIX(row[A_list].value))
-                    self.data_list_db_Y.append(row[B_list].value)
+                    current_value = row[0].value  # Получаем значение текущей ячейки столбца A
+                    current_B_value = row[1].value  # Получаем значение текущей ячейки столбца B
+
+                    # Преобразуем значение B в числовой формат, если оно не является числом
+                    if not isinstance(current_B_value, (int, float)):
+                        current_B_value = float(current_B_value)
+
+                    if current_value == previous_value:  # Проверяем, совпадают ли текущее и предыдущее значения столбца A
+                        previous_B_values.append(current_B_value)  # Добавляем значение B в список
+                    else:
+                        if previous_value is not None:  # Проверяем, было ли уже какое-то значение столбца A
+                            # Если было, усредняем значения B и добавляем в список
+                            avg_B = sum(previous_B_values) / len(previous_B_values)
+                            self.data_list_db_Y.append(avg_B)
+                            self.data_list_db_X.append(self.to_UNIX(previous_value))
+                        # Обновляем значения для следующей итерации
+                        previous_value = current_value
+                        previous_B_values = [current_B_value]
                 except:
                     self.data_list_db_X = []
                     self.data_list_db_Y = []
@@ -193,11 +281,26 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 self.show_warning_message("Неправильные строки")
                 break
 
+        # Добавляем последнее значение
+        if previous_value is not None:
+            avg_B = sum(previous_B_values) / len(previous_B_values)
+            self.data_list_db_Y.append(avg_B)
+            self.data_list_db_X.append(self.to_UNIX(previous_value))
+
+        if len(self.data_list_db_X) != 0 and len(self.data_list_db_Y) != 0:
+            self.data_list_db_X.pop()
+            self.data_list_db_Y.pop()
+
+        self.start_data = self.lists1[self.lists_num1].cell(row=2, column=1).value
+        self.end_data = self.lists1[self.lists_num1].cell(row=self.lists1[self.lists_num1].max_row, column=1).value
+
         print("CubeSat")
         print(f"Выбран файл: {self._filepath_txt}")
-        print("Количество строк:", self.lists1[self.lists_num1].max_row)
+        print("Количество строк:", len(self.data_list_db_Y))
         print("data_list_db_X", self.data_list_db_X)
         print("data_list_db_Y", self.data_list_db_Y)
+        print("Первая строка:", self.start_data)
+        print("Последняя строка:", self.end_data)
         print("_" * 100)
 
         try:
@@ -216,103 +319,102 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.filepath_txt = self._filepath_txt
 
     def update_sun_activity(self):
-        successful = True
         self.ClearSun()
-        self._filepath_sun_txt = QFileDialog.getOpenFileName(self, str("Загрузить .xlsx файл солнечной активности"),
-                                                             "./", str("xlsx (*.xlsx)"))
 
-        if not self._filepath_sun_txt[0]:
-            print("Выбран пустой файл или ничего не выбрано!")
+        self.x_values = []
+
+        input_format = '%d-%b-%Y %H:%M:%S'
+        output_format = '%Y-%m-%dT%H:%M:%S'
+
+        if not self.filepath_txt[0]:
+            self.show_critical_message("Ошибка", "Файл мощности сигнала (.xlsx) не был выбран!")
             return
+        else:
+            print("Солнечная активность")
+            print("Идёт скачивание...")
 
-        self.excel2 = openpyxl.open(self._filepath_sun_txt[0], read_only=True)
-        self.lists2 = self.excel2.worksheets
-        self.lists_num2 = 0
-        A_list = 0
-        B_list = 1
+            # datetime_obj_start = datetime.strptime(self.start_data.strip("'"), input_format)
+            start_time = self.to_sunPy_time(self.start_data)
 
-        self.data_list_sun_X = []
-        self.data_list_sun_Y = []
+            # datetime_obj_end = datetime.strptime(self.end_data.strip("'"), input_format)
+            end_time = self.to_sunPy_time(self.end_data)
 
-        for row in self.lists2[self.lists_num2].iter_rows(min_row=2, max_row=self.lists2[self.lists_num2].max_row, min_col=1, max_col=2):
-            if all(cell.value is not None for cell in row):
-                self.data_list_sun_X.append(row[A_list].value)
-                self.data_list_sun_Y.append(row[B_list].value)
+            query = Fido.search(a.Time(start_time, end_time), a.Instrument('GOES'))
+            files = Fido.fetch(query)
+
+            if files:
+                file = files[0]
+                goes = ts.TimeSeries(file)
+                goes_subset = goes.truncate(start_time, end_time)
+                df = goes_subset.to_dataframe()
+                self.x_values = df['xrsb'].astype(float).tolist()
+
+                file = files[0]
+                goes = ts.TimeSeries(file)
+                goes_subset = goes.truncate(start_time, end_time)
+
+                # Преобразуем TimeSeries в DataFrame
+                df = goes_subset.to_dataframe()
+
+                # Создаем виджет макета
+                layout = pg.GraphicsLayoutWidget(title="Солнечная активность")
+                view = layout.addViewBox()
+                view.setAspectLocked(True)
+
+                self.set_sun_graph(df.index, df.iloc[:, 0], False)
+
+                print("График успешно построен!")
+                print("Start time: " + str(start_time))
+                print("End time: " + str(end_time))
+                print("Количество строк:", len(self.x_values))
+                print("x_values: ", self.x_values)
+                time.sleep(1)
+                print("_" * 100)
             else:
-                self.show_warning_message("Неправильные строки")
-                break
-
-        print("Солнечная активность")
-        print(f"Выбран файл: {self._filepath_sun_txt}")
-        print("Количество строк:", self.lists2[self.lists_num2].max_row)
-        print("data_list_sun_X", self.data_list_sun_X)
-        print("data_list_sun_Y", self.data_list_sun_Y)
-        print("_" * 100)
-
-        try:
-            self.data_list_sun_X = list(map(float, self.data_list_sun_X))
-            self.data_list_sun_Y = list(map(float, self.data_list_sun_Y))
-        except ValueError:
-            self.show_critical_message("Неправильные строки", "Вероятно часть строк не соответствует нужному формату!")
-
-        if self._filepath_sun_txt[0]:
-            self.set_sun_graph(self.data_list_sun_X, self.data_list_sun_Y, False)
-        else:
-            self.ui.file_path_window.setPlainText("Файл солнечной активности не выбран!")
-            self.set_db_graph(0, 0, True)
-
-        self.filepath_sun_txt = self._filepath_sun_txt
-        self._filepath_sun_txt = 0
-        """"
-        if (successful):
-            self.set_sun_graph(0, 0, True)
-            self.set_sun_graph([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [34, 23, 34, 89, 12, 89, 12, 14, 100, 0], False)
-            self.successful_updated = True
-        else:
-            self.successful_updated = False
-            msg = QMessageBox()
-            msg.setIcon(QMessageBox.Critical)
-            msg.setText("Ошибка")
-            msg.setInformativeText('Не удалось получить доступ к данным солнечной активности, проверьте подключение к интернету')
-            msg.setWindowTitle("Получение солнечной активности")
-            msg.exec_()
-            self.successful_updated = False
-        """
+                print("Нет доступных данных для указанного временного интервала.")
 
     def compare_click(self):
         self.ClearCompare()
 
         if not self.filepath_txt[0]:
-            self.show_critical_message("Ошибка", "Файл солнечной активности (.xlsx) не был выбран!")
+            self.show_critical_message("Ошибка", "Файл мощности сигнала (.xlsx) не был выбран!")
+            self.ui.CorrBox.setPlainText(f"Корреляция: -")
             return
 
-        if not self.filepath_sun_txt[0]:
-            self.show_critical_message("Ошибка", "Файл солнечной активности (.xlsx) не был выбран!")
+        if not self.x_values:
+            self.show_critical_message("Ошибка", "Солнечная активность не была получена!")
+            self.ui.CorrBox.setPlainText(f"Корреляция: -")
             return
 
         self.corr_list_db_Y = []
         self.corr_list_sun_Y = []
 
-        for i in range(min(len(self.data_list_db_X), len(self.data_list_sun_X))):
+        for i in range(min(len(self.data_list_db_X), len(self.x_values))):
             self.corr_list_db_Y.append(self.data_list_db_Y[i])
-            self.corr_list_sun_Y.append(self.data_list_sun_Y[i])
+            self.corr_list_sun_Y.append(self.x_values[i])
 
         self.corr_list_db_Y = list(map(float, self.corr_list_db_Y))
         self.corr_list_sun_Y = list(map(float, self.corr_list_sun_Y))
 
         corr = np.corrcoef(self.corr_list_sun_Y, self.corr_list_db_Y)[0, 1]
 
-        if not self.filepath_txt[0]:
-            self.show_critical_message("Ошибка", "Файл солнечной активности (.xlsx) не был выбран!")
+        if not self.x_values:
+            self.show_critical_message("Ошибка", "Солнечная активность не была получена!")
         else:
-            self.show_information_message("Успешно", "Данные сопоставлены успешно.")
+            if len(self.data_list_db_X) != len(self.x_values):
+                self.show_warning_message("Разное количество строк!")
+            else:
+                self.show_information_message("Успешно", "Данные сопоставлены успешно.")
             self.compare_out(self.corr_list_db_Y, self.corr_list_sun_Y, False)
-            print("Корреляция:")
+            print("Корреляция")
             print("Количество объектов:", min(len(self.corr_list_db_Y), len(self.corr_list_sun_Y)))
+            print("Длина corr_list_db_Y: ", len(self.corr_list_db_Y))
+            print("Длина corr_list_sun_Y: ", len(self.corr_list_sun_Y))
             print("corr_list_db_Y:", self.corr_list_db_Y)
             print("corr_list_sun_Y", self.corr_list_sun_Y)
             print("Коэффициент корреляции:", corr)
             self.ui.CorrBox.setPlainText(f"Корреляция: {corr:.2f}")
+            print("_" * 100)
 
         """
         else:
