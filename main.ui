@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>997</width>
-    <height>486</height>
+    <width>1001</width>
+    <height>576</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -112,7 +112,7 @@
   </property>
   <property name="windowIcon">
    <iconset>
-    <normaloff>../Загрузки/satsearch_0aawcw_endurosat_1u_platform.png</normaloff>../Загрузки/satsearch_0aawcw_endurosat_1u_platform.png</iconset>
+    <normaloff>Загрузки/satsearch_0aawcw_endurosat_1u_platform.png</normaloff>Загрузки/satsearch_0aawcw_endurosat_1u_platform.png</iconset>
   </property>
   <property name="autoFillBackground">
    <bool>true</bool>
@@ -190,100 +190,85 @@
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>231</width>
+      <width>281</width>
       <height>71</height>
      </rect>
     </property>
     <property name="font">
      <font>
-      <pointsize>10</pointsize>
+      <pointsize>12</pointsize>
      </font>
     </property>
     <property name="text">
-     <string>Выбрать файл &quot;мощность сигнала&quot;</string>
+     <string>Выбрать файл
+ мощности сигнала</string>
     </property>
    </widget>
    <widget class="QPushButton" name="compare_button">
     <property name="geometry">
      <rect>
-      <x>510</x>
+      <x>650</x>
       <y>10</y>
-      <width>481</width>
+      <width>341</width>
       <height>71</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
     <property name="text">
-     <string>Сопоставить солнечную активность с сигналом</string>
+     <string>Сопоставить солнечную
+ активность с сигналом</string>
     </property>
    </widget>
    <widget class="QTextBrowser" name="textBrowser_one">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>85</y>
-      <width>230</width>
-      <height>51</height>
+      <y>90</y>
+      <width>281</width>
+      <height>71</height>
      </rect>
     </property>
     <property name="html">
      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;График зависимости мощности сигнала CubeSat (dBm) ко времени (UNIX).&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:7.8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Ubuntu'; font-size:11pt;&quot;&gt;График зависимости мощности сигнала CubeSat ко времени.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
    <widget class="QTextBrowser" name="textBrowser_three">
     <property name="geometry">
      <rect>
-      <x>510</x>
-      <y>85</y>
-      <width>481</width>
-      <height>50</height>
+      <x>650</x>
+      <y>90</y>
+      <width>341</width>
+      <height>71</height>
      </rect>
     </property>
-    <property name="markdown">
+    <property name="html">
+     <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:7.8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:7px; margin-bottom:7px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Ubuntu'; font-size:11pt;&quot;&gt;График корреляции мощности сигнала CubeSat и солнечной активности.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+    <property name="markdown" stdset="0">
      <string>График корреляции мощности сигнала CubeSat и солнечной активности.
 
 </string>
-    </property>
-    <property name="html">
-     <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:7px; margin-bottom:7px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;График корреляции мощности сигнала CubeSat и солнечной активности.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-    </property>
-   </widget>
-   <widget class="QTextBrowser" name="textBrowser_two">
-    <property name="geometry">
-     <rect>
-      <x>250</x>
-      <y>85</y>
-      <width>230</width>
-      <height>51</height>
-     </rect>
-    </property>
-    <property name="markdown">
-     <string>График зависимости солнечной активности ко времени.
-
-</string>
-    </property>
-    <property name="html">
-     <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:7px; margin-bottom:7px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;График зависимости солнечной активности ко времени.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
    <widget class="Line" name="line">
     <property name="geometry">
      <rect>
-      <x>487</x>
-      <y>0</y>
-      <width>17</width>
-      <height>491</height>
+      <x>620</x>
+      <y>-30</y>
+      <width>20</width>
+      <height>521</height>
      </rect>
     </property>
     <property name="frameShadow">
@@ -300,10 +285,15 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>380</y>
-      <width>471</width>
+      <y>500</y>
+      <width>981</width>
       <height>41</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>9</pointsize>
+     </font>
     </property>
     <property name="lineWrapMode">
      <enum>QPlainTextEdit::NoWrap</enum>
@@ -318,10 +308,10 @@ p, li { white-space: pre-wrap; }
    <widget class="PlotWidget" name="graph_out" native="true">
     <property name="geometry">
      <rect>
-      <x>510</x>
-      <y>140</y>
-      <width>301</width>
-      <height>311</height>
+      <x>650</x>
+      <y>170</y>
+      <width>341</width>
+      <height>281</height>
      </rect>
     </property>
    </widget>
@@ -329,47 +319,43 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>140</y>
-      <width>230</width>
-      <height>230</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="PlotWidget" name="graph_sun" native="true">
-    <property name="geometry">
-     <rect>
-      <x>250</x>
-      <y>140</y>
-      <width>230</width>
-      <height>230</height>
+      <y>170</y>
+      <width>281</width>
+      <height>281</height>
      </rect>
     </property>
    </widget>
    <widget class="QPushButton" name="input_button_sun">
     <property name="geometry">
      <rect>
-      <x>250</x>
+      <x>330</x>
       <y>10</y>
-      <width>231</width>
+      <width>281</width>
       <height>71</height>
      </rect>
     </property>
     <property name="font">
      <font>
-      <pointsize>8</pointsize>
+      <pointsize>12</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
+      <underline>false</underline>
+      <strikeout>false</strikeout>
       <kerning>true</kerning>
      </font>
     </property>
     <property name="text">
-     <string>Получить солнечную активность из сети</string>
+     <string>Получить
+ солнечную активность</string>
     </property>
    </widget>
    <widget class="QTextEdit" name="CorrBox">
     <property name="geometry">
      <rect>
-      <x>820</x>
-      <y>140</y>
-      <width>171</width>
+      <x>650</x>
+      <y>460</y>
+      <width>341</width>
       <height>31</height>
      </rect>
     </property>
@@ -383,18 +369,85 @@ p, li { white-space: pre-wrap; }
      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;Кореляция: -&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:7.8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Ubuntu'; font-size:9pt;&quot;&gt;Кореляция: -&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
    <widget class="QComboBox" name="comboBox">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>430</y>
-      <width>471</width>
-      <height>24</height>
+      <y>460</y>
+      <width>601</width>
+      <height>31</height>
      </rect>
+    </property>
+   </widget>
+   <widget class="PlotWidget" name="graph_sun" native="true">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>170</y>
+      <width>281</width>
+      <height>281</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QTextBrowser" name="textBrowser_two">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>90</y>
+      <width>281</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="acceptDrops">
+     <bool>true</bool>
+    </property>
+    <property name="tabChangesFocus">
+     <bool>false</bool>
+    </property>
+    <property name="html">
+     <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:7px; margin-bottom:7px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Ubuntu'; font-size:11pt;&quot;&gt;График зависимости солнечной активности ко времени.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+    <property name="markdown" stdset="0">
+     <string>График зависимости солнечной активности ко времени.
+
+</string>
+    </property>
+   </widget>
+   <widget class="Line" name="line_2">
+    <property name="geometry">
+     <rect>
+      <x>300</x>
+      <y>-10</y>
+      <width>20</width>
+      <height>461</height>
+     </rect>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
+    </property>
+    <property name="lineWidth">
+     <number>3</number>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Vertical</enum>
     </property>
    </widget>
   </widget>
