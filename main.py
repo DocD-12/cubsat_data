@@ -474,7 +474,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             print("corr_list_db_Y:", self.corr_list_db_Y)
             print("corr_list_sun_Y", self.corr_list_sun_Y)
             print("Коэффициент корреляции:", corr)
-            self.ui.CorrBox.setPlainText(f"Корреляция: {corr:.2f}")
+            self.ui.CorrBox.setPlainText(f"Корреляция: {corr:.10f}")
             print("_" * 100)
 
         """
@@ -513,6 +513,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 app = QtWidgets.QApplication(sys.argv)
 
 window = MainWindow()
-window.setFixedSize(1001, 576)
+window.setFixedSize(980, 576)
 window.show()
 app.exec()
