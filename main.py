@@ -1,7 +1,7 @@
 import functools as functools
 import sys
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 
 import numpy as np
 import openpyxl
@@ -13,14 +13,85 @@ import sunpy.timeseries as ts
 from sunpy.net import Fido, attrs as a
 import pyqtgraph as pg
 
-
 functools.lru_cache(None)
 
 print("_" * 100)
 
 
+def to_sunPy_time(date_string):
+    date_string = date_string.strip("'")
+    date_components = date_string.split('-')
+
+    months = {'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'Jun': 6, 'Jul': 7, 'Aug': 8, 'Sep': 9, 'Oct': 10,
+              'Nov': 11, 'Dec': 12}
+    month = months[date_components[1]]
+
+    year = int(date_components[2][:4])
+    time_components = date_components[2].split()
+    time_parts = time_components[1].split(':')
+    hour = int(time_parts[0])
+    minute = int(time_parts[1])
+    second = int(time_parts[2])
+
+    datetime_obj = datetime(year, month, int(date_components[0]), hour, minute, second)
+    unix_time = datetime_obj.timestamp()
+
+    return datetime.fromtimestamp(unix_time, timezone.utc).strftime('%Y-%m-%dT%H:%M:%S')
+
+
+def to_UNIX(date_string):
+    date_string = date_string.strip("'")
+    date_components = date_string.split('-')
+
+    months = {'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'Jun': 6, 'Jul': 7, 'Aug': 8, 'Sep': 9, 'Oct': 10,
+              'Nov': 11, 'Dec': 12}
+    month = months[date_components[1]]
+
+    year = int(date_components[2][:4])
+    time_components = date_components[2].split()
+    time_parts = time_components[1].split(':')
+    hour = int(time_parts[0])
+    minute = int(time_parts[1])
+    second = int(time_parts[2])
+
+    datetime_obj = datetime(year, month, int(date_components[0]), hour, minute, second)
+    unix_time = datetime_obj.timestamp()
+
+    return unix_time
+
+
+def show_information_message(text, informative_text):
+    msg = QMessageBox()
+    msg.setIcon(QMessageBox.Information)
+    msg.setText(text)
+    msg.setInformativeText(informative_text)
+    msg.setWindowTitle("Сопоставление данных")
+    print(text, informative_text)
+    msg.exec_()
+
+
+def show_critical_message(text, informative_text):
+    msg = QMessageBox()
+    msg.setIcon(QMessageBox.Critical)
+    msg.setText(text)
+    msg.setInformativeText(informative_text)
+    msg.setWindowTitle("Сопоставление данных")
+    print(text, informative_text)
+    msg.exec_()
+
+
+def show_warning_message(text):
+    msg = QMessageBox()
+    msg.setIcon(QMessageBox.Warning)
+    msg.setText(text)
+    msg.setInformativeText('Часть строк была обрезана, во избежание ошибки!')
+    msg.setWindowTitle("Сопоставление данных")
+    print("Внимание!", text)
+    msg.exec_()
+
+
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
-    def __init__(self, *args, obj=None, **kwargs):
+    def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
@@ -90,6 +161,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.ui.graph_out.clear()
 
     def read_selected_sheet(self, index):
+        flag = 0
+
+        print("CubeSat (изменение листа)")
         self.ClearDB()
         self.set_db_graph(0, 0, True)
 
@@ -114,20 +188,26 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                     if not isinstance(current_B_value, (int, float)):
                         current_B_value = float(current_B_value)
 
-                    if current_value == previous_value:  # Проверяем, совпадают ли текущее и предыдущее значения столбца A
+                    if current_value == previous_value:  # Проверяем, совпадают ли текущее и предыдущее значения
+                        # столбца A
                         previous_B_values.append(current_B_value)  # Добавляем значение B в список
                     else:
                         if previous_value is not None:  # Проверяем, было ли уже какое-то значение столбца A
                             # Если было, усредняем значения B и добавляем в список
                             avg_B = sum(previous_B_values) / len(previous_B_values)
                             self.data_list_db_Y.append(avg_B)
-                            self.data_list_db_X.append(self.to_UNIX(previous_value))
+                            self.data_list_db_X.append(to_UNIX(previous_value))
                         # Обновляем значения для следующей итерации
                         previous_value = current_value
                         previous_B_values = [current_B_value]
-                except Exception as e:
+                except:
                     self.data_list_db_X.clear()  # Очищаем список данных X в случае ошибки
                     self.data_list_db_Y.clear()  # Очищаем список данных Y в случае ошибки
+
+                    flag = 1
+
+                    print(f'Не удалось конвертировать время в UNIX формат. Строка: {row}')
+                    self.ui.file_path_window.setPlainText(f'Не удалось конвертировать время в UNIX формат. Строка: {row}')
 
                     # Создание и отображение сообщения об ошибке
                     msg = QMessageBox()
@@ -139,14 +219,17 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                     msg.exec_()
                     break  # Прерываем выполнение цикла в случае ошибки
             else:
-                self.show_warning_message("Неправильные строки")
+                flag = 1
+
+                self.ui.file_path_window.setPlainText("Неправильные строки")
+                show_warning_message("Неправильные строки")
                 break  # Прерываем выполнение цикла, если есть пустые ячейки в строке
 
         # Добавляем последнее значение
         if previous_value is not None:
             avg_B = sum(previous_B_values) / len(previous_B_values)
             self.data_list_db_Y.append(avg_B)
-            self.data_list_db_X.append(self.to_UNIX(previous_value))
+            self.data_list_db_X.append(to_UNIX(previous_value))
 
         if len(self.data_list_db_X) != 0 and len(self.data_list_db_Y) != 0:
             self.data_list_db_X.pop()
@@ -155,65 +238,28 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.start_data = selected_sheet.cell(row=2, column=1).value
         self.end_data = selected_sheet.cell(row=selected_sheet.max_row, column=1).value
 
-        print("CubeSat")
-        print(f"Выбран лист: {selected_sheet_name}")
-        print("Количество строк:", len(self.data_list_db_Y))
-        print("data_list_db_X:", self.data_list_db_X)
-        print("data_list_db_Y:", self.data_list_db_Y)
-        print("Первая строка:", self.start_data)
-        print("Последняя строка:", self.end_data)
-        print("_" * 100)
-
         try:
             self.data_list_db_X = list(map(float, self.data_list_db_X))
             self.data_list_db_Y = list(map(float, self.data_list_db_Y))
         except ValueError:
-            self.show_critical_message("Неправильные строки", "Вероятно часть строк не соответствует нужному формату!")
+            show_critical_message("Неправильные строки!", "Вероятно часть строк не соответствует нужному формату!")
 
-        self.ui.file_path_window.setPlainText("Выбран файл мощности по пути: " + str(self._filepath_txt))
         self.set_db_graph(self.data_list_db_X, self.data_list_db_Y, False)
 
-    def to_UNIX(self, date_string):
-        date_string = date_string.strip("'")
-        date_components = date_string.split('-')
+        if flag == 0:
+            self.ui.file_path_window.setPlainText(
+                f"Выбран файл мощности по пути: {str(self._filepath_txt)}. Выбран лист: {selected_sheet_name}")
+            print(f"Выбран лист: {selected_sheet_name}")
+            print("Количество строк:", len(self.data_list_db_Y))
+            print("data_list_db_X:", self.data_list_db_X)
+            print("data_list_db_Y:", self.data_list_db_Y)
+            print("Первая строка:", self.start_data)
+            print("Последняя строка:", self.end_data)
 
-        months = {'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'Jun': 6, 'Jul': 7, 'Aug': 8, 'Sep': 9, 'Oct': 10,
-                  'Nov': 11, 'Dec': 12}
-        month = months[date_components[1]]
-
-        year = int(date_components[2][:4])
-        time_components = date_components[2].split()
-        time_parts = time_components[1].split(':')
-        hour = int(time_parts[0])
-        minute = int(time_parts[1])
-        second = int(time_parts[2])
-
-        datetime_obj = datetime(year, month, int(date_components[0]), hour, minute, second)
-        unix_time = datetime_obj.timestamp()
-
-        return unix_time
-
-    def to_sunPy_time(self, date_string):
-        date_string = date_string.strip("'")
-        date_components = date_string.split('-')
-
-        months = {'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'Jun': 6, 'Jul': 7, 'Aug': 8, 'Sep': 9, 'Oct': 10,
-                  'Nov': 11, 'Dec': 12}
-        month = months[date_components[1]]
-
-        year = int(date_components[2][:4])
-        time_components = date_components[2].split()
-        time_parts = time_components[1].split(':')
-        hour = int(time_parts[0])
-        minute = int(time_parts[1])
-        second = int(time_parts[2])
-
-        datetime_obj = datetime(year, month, int(date_components[0]), hour, minute, second)
-        unix_time = datetime_obj.timestamp()
-
-        return datetime.utcfromtimestamp(unix_time).strftime('%Y-%m-%dT%H:%M:%S')
+        print("_" * 100)
 
     def choose_txt(self):
+        print("CubeSat")
         self.ClearDB()
         self._filepath_txt = QFileDialog.getOpenFileName(self, str("Загрузить .xlsx мощности"), "/",
                                                          str("xlsx (*.xlsx)"))
@@ -225,6 +271,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.lists_combo = []
             self.ui.comboBox.clear()
             print("Выбран пустой файл или ничего не выбрано!")
+            self.ui.file_path_window.setPlainText("Выбран пустой файл или ничего не выбрано!")
             print("_" * 100)
             return
 
@@ -244,7 +291,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         previous_value = None
         previous_B_values = []
 
-        for row in self.lists1[self.lists_num1].iter_rows(min_row=2, max_row=self.lists1[self.lists_num1].max_row, min_col=1, max_col=2):
+        for row in self.lists1[self.lists_num1].iter_rows(min_row=2, max_row=self.lists1[self.lists_num1].max_row,
+                                                          min_col=1, max_col=2):
             if all(cell.value is not None for cell in row):
                 try:
                     current_value = row[0].value  # Получаем значение текущей ячейки столбца A
@@ -254,14 +302,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                     if not isinstance(current_B_value, (int, float)):
                         current_B_value = float(current_B_value)
 
-                    if current_value == previous_value:  # Проверяем, совпадают ли текущее и предыдущее значения столбца A
+                    if current_value == previous_value:  # Проверяем, совпадают ли текущее и предыдущее значения
+                        # столбца A
                         previous_B_values.append(current_B_value)  # Добавляем значение B в список
                     else:
                         if previous_value is not None:  # Проверяем, было ли уже какое-то значение столбца A
                             # Если было, усредняем значения B и добавляем в список
                             avg_B = sum(previous_B_values) / len(previous_B_values)
                             self.data_list_db_Y.append(avg_B)
-                            self.data_list_db_X.append(self.to_UNIX(previous_value))
+                            self.data_list_db_X.append(to_UNIX(previous_value))
                         # Обновляем значения для следующей итерации
                         previous_value = current_value
                         previous_B_values = [current_B_value]
@@ -278,14 +327,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                     msg.exec_()
                     break
             else:
-                self.show_warning_message("Неправильные строки")
+                show_warning_message("Неправильные строки!")
                 break
 
-        # Добавляем последнее значение
         if previous_value is not None:
             avg_B = sum(previous_B_values) / len(previous_B_values)
             self.data_list_db_Y.append(avg_B)
-            self.data_list_db_X.append(self.to_UNIX(previous_value))
+            self.data_list_db_X.append(to_UNIX(previous_value))
 
         if len(self.data_list_db_X) != 0 and len(self.data_list_db_Y) != 0:
             self.data_list_db_X.pop()
@@ -294,7 +342,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.start_data = self.lists1[self.lists_num1].cell(row=2, column=1).value
         self.end_data = self.lists1[self.lists_num1].cell(row=self.lists1[self.lists_num1].max_row, column=1).value
 
-        print("CubeSat")
         print(f"Выбран файл: {self._filepath_txt}")
         print("Количество строк:", len(self.data_list_db_Y))
         print("data_list_db_X", self.data_list_db_X)
@@ -307,37 +354,36 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.data_list_db_X = list(map(float, self.data_list_db_X))
             self.data_list_db_Y = list(map(float, self.data_list_db_Y))
         except ValueError:
-            self.show_critical_message("Неправильные строки", "Вероятно часть строк не соответствует нужному формату!")
+            show_critical_message("Неправильные строки!", "Вероятно часть строк не соответствует нужному формату!")
 
         if self._filepath_txt[0]:
             self.ui.file_path_window.setPlainText("Выбран файл мощности по пути: " + str(self._filepath_txt))
             self.set_db_graph(self.data_list_db_X, self.data_list_db_Y, False)
         else:
-            self.ui.file_path_window.setPlainText("Файл мощности не выбран")
+            self.ui.file_path_window.setPlainText("Файл мощности не выбран!")
             self.set_db_graph(0, 0, True)
 
         self.filepath_txt = self._filepath_txt
 
     def update_sun_activity(self):
+        print("Солнечная активность")
         self.ClearSun()
-
         self.x_values = []
 
-        input_format = '%d-%b-%Y %H:%M:%S'
-        output_format = '%Y-%m-%dT%H:%M:%S'
-
         if not self.filepath_txt[0]:
-            self.show_critical_message("Ошибка", "Файл мощности сигнала (.xlsx) не был выбран!")
+            self.ui.file_path_window.setPlainText("Файл мощности сигнала (.xlsx) не был выбран!")
+            show_critical_message("Ошибка!", "Файл мощности сигнала (.xlsx) не был выбран!")
+            print("_" * 100)
             return
         else:
-            print("Солнечная активность")
+            self.ui.file_path_window.setPlainText("Идёт скачивание...")
             print("Идёт скачивание...")
 
             # datetime_obj_start = datetime.strptime(self.start_data.strip("'"), input_format)
-            start_time = self.to_sunPy_time(self.start_data)
+            start_time = to_sunPy_time(self.start_data)
 
             # datetime_obj_end = datetime.strptime(self.end_data.strip("'"), input_format)
-            end_time = self.to_sunPy_time(self.end_data)
+            end_time = to_sunPy_time(self.end_data)
 
             query = Fido.search(a.Time(start_time, end_time), a.Instrument('GOES'))
             files = Fido.fetch(query)
@@ -364,6 +410,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 self.set_sun_graph(df.index, df.iloc[:, 0], False)
 
                 print("График успешно построен!")
+                self.ui.file_path_window.setPlainText("График солнечной активности успешно построен!")
                 print("Start time: " + str(start_time))
                 print("End time: " + str(end_time))
                 print("Количество строк:", len(self.x_values))
@@ -371,18 +418,31 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 time.sleep(1)
                 print("_" * 100)
             else:
+                self.ui.file_path_window.setPlainText("Нет доступных данных для указанного временного интервала.")
                 print("Нет доступных данных для указанного временного интервала.")
 
     def compare_click(self):
+        print("Корреляция")
         self.ClearCompare()
 
+        if (not self.filepath_txt[0]) and (not self.x_values):
+            self.ui.file_path_window.setPlainText("Файл мощности не был выбран и солнечная активность не была получена!")
+            show_critical_message("Ошибка!", "Файл мощности не был выбран и солнечная активность не была получена!")
+            print("_" * 100)
+            self.ui.CorrBox.setPlainText(f"Корреляция: -")
+            return
+
         if not self.filepath_txt[0]:
-            self.show_critical_message("Ошибка", "Файл мощности сигнала (.xlsx) не был выбран!")
+            self.ui.file_path_window.setPlainText("Файл мощности сигнала (.xlsx) не был выбран!")
+            show_critical_message("Ошибка!", "Файл мощности сигнала (.xlsx) не был выбран!")
+            print("_" * 100)
             self.ui.CorrBox.setPlainText(f"Корреляция: -")
             return
 
         if not self.x_values:
-            self.show_critical_message("Ошибка", "Солнечная активность не была получена!")
+            self.ui.file_path_window.setPlainText("Солнечная активность не была получена!")
+            show_critical_message("Ошибка!", "Солнечная активность не была получена!")
+            print("_" * 100)
             self.ui.CorrBox.setPlainText(f"Корреляция: -")
             return
 
@@ -399,14 +459,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         corr = np.corrcoef(self.corr_list_sun_Y, self.corr_list_db_Y)[0, 1]
 
         if not self.x_values:
-            self.show_critical_message("Ошибка", "Солнечная активность не была получена!")
+            show_critical_message("Ошибка!", "Солнечная активность не была получена!")
         else:
             if len(self.data_list_db_X) != len(self.x_values):
-                self.show_warning_message("Разное количество строк!")
+                self.ui.file_path_window.setPlainText("Внимание! Разное количество строк!")
+                show_warning_message("Разное количество строк!")
             else:
-                self.show_information_message("Успешно", "Данные сопоставлены успешно.")
+                self.ui.file_path_window.setPlainText("Данные сопоставлены успешно.")
+                show_information_message("Успешно!", "Данные сопоставлены успешно.")
             self.compare_out(self.corr_list_db_Y, self.corr_list_sun_Y, False)
-            print("Корреляция")
             print("Количество объектов:", min(len(self.corr_list_db_Y), len(self.corr_list_sun_Y)))
             print("Длина corr_list_db_Y: ", len(self.corr_list_db_Y))
             print("Длина corr_list_sun_Y: ", len(self.corr_list_sun_Y))
@@ -426,30 +487,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             msg.exec_()
         """
 
-    def show_warning_message(self, text):
-        msg = QMessageBox()
-        msg.setIcon(QMessageBox.Warning)
-        msg.setText(text)
-        msg.setInformativeText('Часть строк была обрезана, во избежание ошибки!')
-        msg.setWindowTitle("Сопоставление данных")
-        msg.exec_()
-
-    def show_critical_message(self, text, informative_text):
-        msg = QMessageBox()
-        msg.setIcon(QMessageBox.Critical)
-        msg.setText(text)
-        msg.setInformativeText(informative_text)
-        msg.setWindowTitle("Сопоставление данных")
-        msg.exec_()
-
-    def show_information_message(self, text, informative_text):
-        msg = QMessageBox()
-        msg.setIcon(QMessageBox.Information)
-        msg.setText(text)
-        msg.setInformativeText(informative_text)
-        msg.setWindowTitle("Сопоставление данных")
-        msg.exec_()
-
     def compare_out(self, activity, power_db, clear):  # Вывод графика зависимости солнечной активности от db
         if not clear:
             poly = np.polyfit(self.corr_list_db_Y, self.corr_list_sun_Y, deg=3)
@@ -460,15 +497,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         else:
             self.ui.graph_out.clear()
 
-    def set_db_graph(self, time, db, clear):  # Вывод графика зависимости времени от db
+    def set_db_graph(self, time_db, db, clear):  # Вывод графика зависимости времени от db
         if not clear:
-            self.ui.grap_db.plot(time, db)
+            self.ui.grap_db.plot(time_db, db)
         else:
             self.ui.grap_db.clear()
 
-    def set_sun_graph(self, activity, time, clear):  # Вывод графика зависимости солнечной активности от времени
+    def set_sun_graph(self, activity, time_sun, clear):  # Вывод графика зависимости солнечной активности от времени
         if not clear:
-            self.ui.graph_sun.plot(activity, time)
+            self.ui.graph_sun.plot(activity, time_sun)
         else:
             self.ui.graph_sun.clear()
 
@@ -476,6 +513,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 app = QtWidgets.QApplication(sys.argv)
 
 window = MainWindow()
-window.setFixedSize(997, 486)
+window.setFixedSize(1001, 576)
 window.show()
 app.exec()
