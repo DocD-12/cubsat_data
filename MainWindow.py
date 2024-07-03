@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(980, 576)
+        MainWindow.resize(1001, 576)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -83,22 +83,16 @@ class Ui_MainWindow(object):
         self.inputbutton.setFont(font)
         self.inputbutton.setObjectName("inputbutton")
         self.compare_button = QtWidgets.QPushButton(self.centralwidget)
-        self.compare_button.setGeometry(QtCore.QRect(650, 10, 321, 71))
+        self.compare_button.setGeometry(QtCore.QRect(650, 10, 341, 71))
         font = QtGui.QFont()
         font.setPointSize(12)
         self.compare_button.setFont(font)
         self.compare_button.setObjectName("compare_button")
         self.textBrowser_one = QtWidgets.QTextBrowser(self.centralwidget)
         self.textBrowser_one.setGeometry(QtCore.QRect(10, 90, 281, 71))
-        font = QtGui.QFont()
-        font.setPointSize(12)
-        self.textBrowser_one.setFont(font)
         self.textBrowser_one.setObjectName("textBrowser_one")
         self.textBrowser_three = QtWidgets.QTextBrowser(self.centralwidget)
-        self.textBrowser_three.setGeometry(QtCore.QRect(650, 90, 321, 71))
-        font = QtGui.QFont()
-        font.setPointSize(12)
-        self.textBrowser_three.setFont(font)
+        self.textBrowser_three.setGeometry(QtCore.QRect(650, 90, 341, 71))
         self.textBrowser_three.setObjectName("textBrowser_three")
         self.line = QtWidgets.QFrame(self.centralwidget)
         self.line.setGeometry(QtCore.QRect(620, -30, 20, 521))
@@ -107,15 +101,15 @@ class Ui_MainWindow(object):
         self.line.setFrameShape(QtWidgets.QFrame.VLine)
         self.line.setObjectName("line")
         self.file_path_window = QtWidgets.QPlainTextEdit(self.centralwidget)
-        self.file_path_window.setGeometry(QtCore.QRect(10, 500, 961, 41))
+        self.file_path_window.setGeometry(QtCore.QRect(10, 500, 981, 41))
         font = QtGui.QFont()
-        font.setPointSize(11)
+        font.setPointSize(9)
         self.file_path_window.setFont(font)
         self.file_path_window.setLineWrapMode(QtWidgets.QPlainTextEdit.NoWrap)
         self.file_path_window.setReadOnly(True)
         self.file_path_window.setObjectName("file_path_window")
         self.graph_out = PlotWidget(self.centralwidget)
-        self.graph_out.setGeometry(QtCore.QRect(650, 170, 321, 281))
+        self.graph_out.setGeometry(QtCore.QRect(650, 170, 341, 281))
         self.graph_out.setObjectName("graph_out")
         self.grap_db = PlotWidget(self.centralwidget)
         self.grap_db.setGeometry(QtCore.QRect(10, 170, 281, 281))
@@ -133,18 +127,12 @@ class Ui_MainWindow(object):
         self.input_button_sun.setFont(font)
         self.input_button_sun.setObjectName("input_button_sun")
         self.CorrBox = QtWidgets.QTextEdit(self.centralwidget)
-        self.CorrBox.setGeometry(QtCore.QRect(650, 460, 321, 31))
-        font = QtGui.QFont()
-        font.setPointSize(11)
-        self.CorrBox.setFont(font)
+        self.CorrBox.setGeometry(QtCore.QRect(650, 460, 341, 31))
         self.CorrBox.setMouseTracking(False)
         self.CorrBox.setReadOnly(True)
         self.CorrBox.setObjectName("CorrBox")
         self.comboBox = QtWidgets.QComboBox(self.centralwidget)
         self.comboBox.setGeometry(QtCore.QRect(10, 460, 601, 31))
-        font = QtGui.QFont()
-        font.setPointSize(12)
-        self.comboBox.setFont(font)
         self.comboBox.setObjectName("comboBox")
         self.graph_sun = PlotWidget(self.centralwidget)
         self.graph_sun.setGeometry(QtCore.QRect(330, 170, 281, 281))
@@ -153,7 +141,7 @@ class Ui_MainWindow(object):
         self.textBrowser_two.setEnabled(True)
         self.textBrowser_two.setGeometry(QtCore.QRect(330, 90, 281, 71))
         font = QtGui.QFont()
-        font.setPointSize(12)
+        font.setPointSize(8)
         font.setBold(False)
         font.setWeight(50)
         self.textBrowser_two.setFont(font)
@@ -184,30 +172,30 @@ class Ui_MainWindow(object):
         self.textBrowser_one.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'Ubuntu\'; font-size:12pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">График зависимости мощности сигнала CubeSat ко времени.</p></body></html>"))
-        self.textBrowser_three.setMarkdown(_translate("MainWindow", "График корреляции мощности сигнала CubeSat и солнечной активности.\n"
-"\n"
-""))
+"</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:7.8pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Ubuntu\'; font-size:11pt;\">График зависимости мощности сигнала CubeSat ко времени.</span></p></body></html>"))
         self.textBrowser_three.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'Ubuntu\'; font-size:12pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:7px; margin-bottom:7px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">График корреляции мощности сигнала CubeSat и солнечной активности.</p></body></html>"))
+"</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:7.8pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:7px; margin-bottom:7px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Ubuntu\'; font-size:11pt;\">График корреляции мощности сигнала CubeSat и солнечной активности.</span></p></body></html>"))
+        self.textBrowser_three.setProperty("markdown", _translate("MainWindow", "График корреляции мощности сигнала CubeSat и солнечной активности.\n"
+"\n"
+""))
         self.file_path_window.setPlainText(_translate("MainWindow", "Файл мощности не выбран"))
         self.input_button_sun.setText(_translate("MainWindow", "Получить \n"
 " солнечную активность"))
         self.CorrBox.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'Ubuntu\'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:12pt;\">Корреляция: -</span></p></body></html>"))
-        self.textBrowser_two.setMarkdown(_translate("MainWindow", "График зависимости солнечной активности ко времени.\n"
-"\n"
-""))
+"</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:7.8pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Ubuntu\'; font-size:9pt;\">Кореляция: -</span></p></body></html>"))
         self.textBrowser_two.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'Ubuntu\'; font-size:12pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:5px; margin-bottom:5px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">График зависимости солнечной активности ко времени.</p></body></html>"))
+"</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:7px; margin-bottom:7px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Ubuntu\'; font-size:11pt;\">График зависимости солнечной активности ко времени.</span></p></body></html>"))
+        self.textBrowser_two.setProperty("markdown", _translate("MainWindow", "График зависимости солнечной активности ко времени.\n"
+"\n"
+""))
 from pyqtgraph import PlotWidget

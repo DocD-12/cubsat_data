@@ -1,4 +1,4 @@
-import functools as functools
+import functools
 import sys
 import time
 from datetime import datetime, timezone
@@ -13,51 +13,30 @@ import sunpy.timeseries as ts
 from sunpy.net import Fido, attrs as a
 import pyqtgraph as pg
 
+import os
+
 functools.lru_cache(None)
 
 print("_" * 100)
 
 
 def to_sunPy_time(date_string):
-    date_string = date_string.strip("'")
-    date_components = date_string.split('-')
-
-    months = {'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'Jun': 6, 'Jul': 7, 'Aug': 8, 'Sep': 9, 'Oct': 10,
-              'Nov': 11, 'Dec': 12}
-    month = months[date_components[1]]
-
-    year = int(date_components[2][:4])
-    time_components = date_components[2].split()
-    time_parts = time_components[1].split(':')
-    hour = int(time_parts[0])
-    minute = int(time_parts[1])
-    second = int(time_parts[2])
-
-    datetime_obj = datetime(year, month, int(date_components[0]), hour, minute, second)
-    unix_time = datetime_obj.timestamp()
-
-    return datetime.fromtimestamp(unix_time, timezone.utc).strftime('%Y-%m-%dT%H:%M:%S')
+    try:
+        date_string = date_string.strip("'")
+        datetime_obj = datetime.strptime(date_string, '%d-%b-%Y %H:%M:%S')
+        unix_time = datetime_obj.timestamp()
+        return datetime.fromtimestamp(unix_time, timezone.utc).strftime('%Y-%m-%dT%H:%M:%S')
+    except:
+        return None
 
 
 def to_UNIX(date_string):
-    date_string = date_string.strip("'")
-    date_components = date_string.split('-')
-
-    months = {'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'Jun': 6, 'Jul': 7, 'Aug': 8, 'Sep': 9, 'Oct': 10,
-              'Nov': 11, 'Dec': 12}
-    month = months[date_components[1]]
-
-    year = int(date_components[2][:4])
-    time_components = date_components[2].split()
-    time_parts = time_components[1].split(':')
-    hour = int(time_parts[0])
-    minute = int(time_parts[1])
-    second = int(time_parts[2])
-
-    datetime_obj = datetime(year, month, int(date_components[0]), hour, minute, second)
-    unix_time = datetime_obj.timestamp()
-
-    return unix_time
+    try:
+        date_string = date_string.strip("'")
+        datetime_obj = datetime.strptime(date_string, '%d-%b-%Y %H:%M:%S')
+        return datetime_obj.timestamp()
+    except:
+        return None
 
 
 def show_information_message(text, informative_text):
@@ -260,30 +239,100 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def choose_txt(self):
         print("CubeSat")
-        self.ClearDB()
-        self._filepath_txt = QFileDialog.getOpenFileName(self, str("Загрузить .xlsx мощности"), "/",
-                                                         str("xlsx (*.xlsx)"))
 
-        if not self._filepath_txt[0]:
-            self.excel1 = None
-            self.lists1 = None
-            self.filepath_txt = self._filepath_txt
-            self.lists_combo = []
-            self.ui.comboBox.clear()
-            print("Выбран пустой файл или ничего не выбрано!")
-            self.ui.file_path_window.setPlainText("Выбран пустой файл или ничего не выбрано!")
-            print("_" * 100)
+        self.ClearDB()
+
+        num_files = 0
+        self._filepath_txt = None
+        found_files = []
+
+        try:
+            # Проходимся по всем файлам и папкам в корневой папке, для поиска подходящего файла
+            for root, dirs, files in os.walk('.'):
+                for file in files:
+                    if file.endswith(".xlsx") and not file.startswith('~') and not file.startswith('.'):
+                        num_files += 1
+                        found_files.append(os.path.join(root, file))
+
+            # Отладочный вывод найденных файлов
+            print("Найденные файлы:", found_files)
+
+            if num_files == 0:
+                print("Не найден нужный файл в корневом каталоге!")
+
+            if num_files > 1:
+                self.excel1 = None
+                self.lists1 = None
+                self.lists_combo = []
+                self.ui.comboBox.clear()
+                print(f"В корневом каталоге найдено несколько подходящих файлов! ({num_files})")
+                self.ui.file_path_window.setPlainText(
+                    f"В корневом каталоге найдено несколько подходящих файлов! ({num_files})")
+                self._filepath_txt = QFileDialog.getOpenFileName(self, "Выберете нужный .xlsx файл мощности", ".",
+                                                                 "xlsx (*.xlsx)")
+                self.filepath_txt = self._filepath_txt
+
+                if not self._filepath_txt[0]:
+                    self.excel1 = None
+                    self.lists1 = None
+                    self.filepath_txt = self._filepath_txt
+                    self.lists_combo = []
+                    self.ui.comboBox.clear()
+                    print("Выбран пустой файл или ничего не выбрано!")
+                    self.ui.file_path_window.setPlainText("Выбран пустой файл или ничего не выбрано!")
+                    print("_" * 100)
+                    return
+
+                self.excel1 = openpyxl.load_workbook(self._filepath_txt[0], read_only=True)
+                self._filepath_txt = self._filepath_txt[0]
+                print("_" * 100)
+            else:
+                self._filepath_txt = found_files[0]
+                try:
+                    self.excel1 = openpyxl.load_workbook(self._filepath_txt, read_only=True)
+                except Exception as e:
+                    print("Ошибка при открытии файла:", e)
+                    print("Открываем меню выбора файла")
+                    self._filepath_txt = QFileDialog.getOpenFileName(self, "Загрузить .xlsx мощности", "/",
+                                                                     "xlsx (*.xlsx)")
+
+                    if not self._filepath_txt[0]:
+                        self.excel1 = None
+                        self.lists1 = None
+                        self.filepath_txt = self._filepath_txt
+                        self.lists_combo = []
+                        self.ui.comboBox.clear()
+                        print("Выбран пустой файл или ничего не выбрано!")
+                        self.ui.file_path_window.setPlainText("Выбран пустой файл или ничего не выбрано!")
+                        print("_" * 100)
+                        return
+
+                    self.excel1 = openpyxl.load_workbook(self._filepath_txt[0], read_only=True)
+                    self._filepath_txt = self._filepath_txt[0]
+
+        except FileNotFoundError as e:
+            print(str(e))
+            self._filepath_txt = QFileDialog.getOpenFileName(self, "Загрузить .xlsx мощности", "/", "xlsx (*.xlsx)")
+
+            if not self._filepath_txt[0]:
+                self.excel1 = None
+                self.lists1 = None
+                self.filepath_txt = self._filepath_txt
+                self.lists_combo = []
+                self.ui.comboBox.clear()
+                print("Выбран пустой файл или ничего не выбрано!")
+                self.ui.file_path_window.setPlainText("Выбран пустой файл или ничего не выбрано!")
+                print("_" * 100)
+                return
+
+            self.excel1 = openpyxl.load_workbook(self._filepath_txt[0], read_only=True)
+            self._filepath_txt = self._filepath_txt[0]
+        except Exception as e:
+            print("Произошла ошибка:", e)
             return
 
-        self.excel1 = openpyxl.open(self._filepath_txt[0], read_only=True)
         self.lists1 = self.excel1.worksheets
         self.lists_num1 = 0
-
-        self.lists_combo = self.excel1.sheetnames
-        self.ui.comboBox.clear()
-        self.ui.comboBox.addItems(self.lists_combo)
-        self.ui.comboBox.currentIndexChanged.connect(self.read_selected_sheet)
-        self._filepath_txt = self._filepath_txt[0]
 
         self.data_list_db_X = []
         self.data_list_db_Y = []
@@ -323,9 +372,19 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                     msg.setText("Ошибка")
                     msg.setInformativeText(
                         f'Не удалось конвертировать время в UNIX формат. Строка: {row}')
+                    self.ui.file_path_window.setPlainText(f'Не удалось конвертировать время в UNIX формат. Строка: {row}')
                     msg.setWindowTitle("Конвертация данных")
                     msg.exec_()
-                    break
+
+                    self.excel1 = None
+                    self.lists1 = None
+                    self.filepath_txt = self._filepath_txt
+                    self.lists_combo = []
+                    self.ui.comboBox.clear()
+
+                    self.ClearDB()
+
+                    return
             else:
                 show_warning_message("Неправильные строки!")
                 break
@@ -338,6 +397,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         if len(self.data_list_db_X) != 0 and len(self.data_list_db_Y) != 0:
             self.data_list_db_X.pop()
             self.data_list_db_Y.pop()
+
+        self.lists_combo = self.excel1.sheetnames
+        self.ui.comboBox.clear()
+        self.ui.comboBox.addItems(self.lists_combo)
+        self.ui.comboBox.currentIndexChanged.connect(self.read_selected_sheet)
 
         self.start_data = self.lists1[self.lists_num1].cell(row=2, column=1).value
         self.end_data = self.lists1[self.lists_num1].cell(row=self.lists1[self.lists_num1].max_row, column=1).value
@@ -466,7 +530,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 show_warning_message("Разное количество строк!")
             else:
                 self.ui.file_path_window.setPlainText("Данные сопоставлены успешно.")
-                show_information_message("Успешно!", "Данные сопоставлены успешно.")
+                #show_information_message("Успешно!", "Данные сопоставлены успешно.")
             self.compare_out(self.corr_list_db_Y, self.corr_list_sun_Y, False)
             print("Количество объектов:", min(len(self.corr_list_db_Y), len(self.corr_list_sun_Y)))
             print("Длина corr_list_db_Y: ", len(self.corr_list_db_Y))
@@ -474,7 +538,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             print("corr_list_db_Y:", self.corr_list_db_Y)
             print("corr_list_sun_Y", self.corr_list_sun_Y)
             print("Коэффициент корреляции:", corr)
-            self.ui.CorrBox.setPlainText(f"Корреляция: {corr:.10f}")
+            self.ui.CorrBox.setPlainText(f"Корреляция: {corr:.2f}")
             print("_" * 100)
 
         """
@@ -513,6 +577,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 app = QtWidgets.QApplication(sys.argv)
 
 window = MainWindow()
-window.setFixedSize(980, 576)
+window.setFixedSize(1001, 576)
 window.show()
 app.exec()
